@@ -1,5 +1,106 @@
 package draw_jeux;
 
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
+
+
 public class Interface {
+
+	private JFrame frame;
+
+	/**
+	 * Launch the application.
+	 */
+	
+	public static void connexion(String[] test) {
+		  
+	     final ServerSocket serveurSocket  ;
+	     final Socket clientSocket ;
+	     final BufferedReader in;
+	     final PrintWriter out;
+	     final Scanner sc=new Scanner(System.in);
+	     
+	     try {
+	         serveurSocket = new ServerSocket(8080);
+	         clientSocket = serveurSocket.accept();
+	         out = new PrintWriter(clientSocket.getOutputStream());
+	         in = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
+	         Thread envoi= new Thread(new Runnable() {
+	            public String msg;
+	            @Override
+	            public void run() {
+	               while(true){
+	                  msg = sc.nextLine();
+	                  out.println(msg);
+	                  out.flush();
+	               }
+	            }
+	         });
+	         envoi.start();
+	     
+	         Thread recevoir= new Thread(new Runnable() {
+	            String msg ;
+	            @Override
+	            public void run() {
+	               try {
+	                  msg = in.readLine();
+	                  //tant que le client est connecté
+	                  while(msg!=null){
+	                     System.out.println("Client : "+msg);
+	                     msg = in.readLine();
+	                  }
+	                  //sortir de la boucle si le client a déconecté
+	                  System.out.println("Client déconecté");
+	                  //fermer le flux et la session socket
+	                  out.close();
+	                  clientSocket.close();
+	                  serveurSocket.close();
+	               } catch (IOException e) {
+	                    e.printStackTrace();
+	               }
+	           }
+	        });
+	        recevoir.start();
+	        }catch (IOException e) {
+	           e.printStackTrace();
+	        }
+	     }
+	
+	
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Interface window = new Interface();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public Interface() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 450, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
 
 }
