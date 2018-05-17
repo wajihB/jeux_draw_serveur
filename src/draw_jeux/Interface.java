@@ -9,70 +9,22 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
+import javax.swing.JButton;
+import java.awt.BorderLayout;
+import net.miginfocom.swing.MigLayout;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
 
 
 public class Interface {
 
-	private JFrame frame;
 
-	/**
-	 * Launch the application.
-	 */
+	private JFrame frame;
+	private JTextField textField;
+	public static String msgClientr;
+	public static String msgServeurr;
 	
-	public static void connexion(String[] test) {
-		  
-	     final ServerSocket serveurSocket  ;
-	     final Socket clientSocket ;
-	     final BufferedReader in;
-	     final PrintWriter out;
-	     final Scanner sc=new Scanner(System.in);
-	     
-	     try {
-	         serveurSocket = new ServerSocket(8080);
-	         clientSocket = serveurSocket.accept();
-	         out = new PrintWriter(clientSocket.getOutputStream());
-	         in = new BufferedReader (new InputStreamReader (clientSocket.getInputStream()));
-	         Thread envoi= new Thread(new Runnable() {
-	            public String msg;
-	            @Override
-	            public void run() {
-	               while(true){
-	                  msg = sc.nextLine();
-	                  out.println(msg);
-	                  out.flush();
-	               }
-	            }
-	         });
-	         envoi.start();
-	     
-	         Thread recevoir= new Thread(new Runnable() {
-	            String msg ;
-	            @Override
-	            public void run() {
-	               try {
-	                  msg = in.readLine();
-	                  //tant que le client est connecté
-	                  while(msg!=null){
-	                     System.out.println("Client : "+msg);
-	                     msg = in.readLine();
-	                  }
-	                  //sortir de la boucle si le client a déconecté
-	                  System.out.println("Client déconecté");
-	                  //fermer le flux et la session socket
-	                  out.close();
-	                  clientSocket.close();
-	                  serveurSocket.close();
-	               } catch (IOException e) {
-	                    e.printStackTrace();
-	               }
-	           }
-	        });
-	        recevoir.start();
-	        }catch (IOException e) {
-	           e.printStackTrace();
-	        }
-	     }
-	
+	//methode pour l'interface graphique
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -85,22 +37,35 @@ public class Interface {
 				}
 			}
 		});
+		
+		msgClientr=Serveurchat.getMsgClient();
+		msgServeurr=Serveurchat.getMsgServeur();
+		System.out.println(msgClientr);
+	}
+	public void recuperationmsg () {
+		
+	
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public Interface() {
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
+
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new MigLayout("", "[434px,grow]", "[200][][]"));
+		
+		JLabel lblNewLabel = new JLabel("message : "+msgClientr);
+		frame.getContentPane().add(lblNewLabel, "cell 0 0");
+		
+		textField = new JTextField();
+		frame.getContentPane().add(textField, "cell 0 1,growx");
+		textField.setColumns(10);
+		
+		JButton btnEnvoyer = new JButton("Envoyer");
+		frame.getContentPane().add(btnEnvoyer, "cell 0 2,growx,aligny top");
 	}
-
-}
+	}
