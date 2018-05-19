@@ -40,7 +40,7 @@ public class Interface {
 		
 		msgClientr=Serveurchat.getMsgClient();
 		msgServeurr=Serveurchat.getMsgServeur();
-		System.out.println(msgClientr);
+		
 	}
 	public void recuperationmsg () {
 		
